@@ -14,23 +14,27 @@ app.get("/", (req, res) => {
 });
 
 app.post("/form", async (req, res) => {
-  console.log(req.fields);
-  const DOMAIN = process.env.MAILGUN_DOMAIN;
-  const mg = mailgun({
-    apiKey: process.env.MAILGUN_API_KEY,
-    domain: DOMAIN,
-  });
-  const data = {
-    from: `${req.fields.firstname} ${req.fields.lastname} <${req.fields.email}>`,
-    to: process.env.MY_EMAIL,
-    subject: `${req.fields.subject}`,
-    text: `${req.fields.message}`,
-  };
-  await mg.messages().send(data, function (error, body) {
-    console.log(body);
-    console.log(error);
-  });
-  res.json({ message: "Données bien reçues" });
+  try {
+    console.log(req.fields);
+    const DOMAIN = process.env.MAILGUN_DOMAIN;
+    const mg = mailgun({
+      apiKey: process.env.MAILGUN_API_KEY,
+      domain: DOMAIN,
+    });
+    const data = {
+      from: `${req.fields.firstname} ${req.fields.lastname} <${req.fields.email}>`,
+      to: process.env.MY_EMAIL,
+      subject: `${req.fields.subject}`,
+      text: `${req.fields.message}`,
+    };
+    await mg.messages().send(data, function (error, body) {
+      console.log(body);
+      console.log(error);
+    });
+    res.json({ message: "Données bien reçues" });
+  } catch (error) {
+    res.json({ message: error.message });
+  }
 });
 
 app.all("*", (req, res) => {
